@@ -1,11 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function DarkModeToggle() {
-  const [isDark, setIsDark] = useState(
-    () => typeof document !== "undefined" && document.documentElement.classList.contains("dark")
-  );
+  const [isDark, setIsDark] = useState(false);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- syncing from the DOM (external system) set by the pre-hydration theme script, not derived state
+    setIsDark(document.documentElement.classList.contains("dark"));
+  }, []);
 
   function toggle() {
     const next = !isDark;

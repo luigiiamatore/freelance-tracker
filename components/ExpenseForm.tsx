@@ -3,6 +3,7 @@
 import { useActionState, useRef, useEffect } from "react";
 import { addExpense, type ExpenseFormState } from "@/app/actions/expenses";
 import { EXPENSE_CATEGORIES } from "@/lib/types";
+import DateField from "@/components/DateField";
 
 const inputClass =
   "rounded-md border border-zinc-300 bg-transparent px-3 py-2 text-sm text-zinc-900 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 dark:border-zinc-700 dark:text-zinc-50";
@@ -60,7 +61,7 @@ export default function ExpenseForm() {
 
       <div className="flex flex-col gap-1">
         <label htmlFor="date" className={labelClass}>Date</label>
-        <input id="date" name="date" type="date" required className={inputClass} />
+        <DateField id="date" name="date" required />
       </div>
 
       {state?.error && (
