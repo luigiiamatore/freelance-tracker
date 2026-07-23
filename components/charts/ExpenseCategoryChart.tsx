@@ -32,16 +32,20 @@ const DARK_SLOTS: Record<ExpenseCategory, string> = {
 const LIGHT = { grid: "#e1e0d9", text: "#898781", surface: "#fcfcfb", ink: "#0b0b0b" };
 const DARK = { grid: "#2c2c2a", text: "#898781", surface: "#1a1a19", ink: "#ffffff" };
 
-export default function ExpenseCategoryChart({ data }: { data: Point[] }) {
+export default function ExpenseCategoryChart({
+  data,
+  title = "Expenses by category",
+}: {
+  data: Point[];
+  title?: string;
+}) {
   const isDark = useIsDark();
   const c = isDark ? DARK : LIGHT;
   const slots = isDark ? DARK_SLOTS : LIGHT_SLOTS;
 
   return (
     <div className="rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900">
-      <h3 className="mb-4 text-sm font-semibold text-zinc-900 dark:text-zinc-50">
-        Expenses by category
-      </h3>
+      <h3 className="mb-4 text-sm font-semibold text-zinc-900 dark:text-zinc-50">{title}</h3>
       <ResponsiveContainer width="100%" height={260}>
         <BarChart data={data} margin={{ top: 20, right: 12, left: 0, bottom: 0 }}>
           <CartesianGrid vertical={false} stroke={c.grid} />
