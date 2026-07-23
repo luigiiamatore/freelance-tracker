@@ -40,6 +40,14 @@ export default async function Nav() {
         <div className="flex items-center gap-2">
           <DarkModeToggle />
           {user && (
+            <a
+              href="/api/export"
+              className="rounded-md border border-zinc-300 px-2.5 py-1.5 text-sm text-zinc-600 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
+            >
+              Export
+            </a>
+          )}
+          {user && (
             <form action={logout}>
               <button
                 type="submit"
