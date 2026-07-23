@@ -24,7 +24,7 @@ export default async function CalculatorPage() {
       <div>
         <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-50">Tax calculator</h1>
         <p className="text-sm text-zinc-500 dark:text-zinc-400">
-          Estimate Italian freelance taxes on your net profit.
+          Estimate taxes under the Italian regime forfettario.
         </p>
       </div>
       <TaxCalculator defaultIncome={totalIncome} defaultExpenses={totalExpenses} />
