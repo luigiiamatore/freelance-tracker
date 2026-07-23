@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { getAttachmentsByParent } from "@/lib/attachments";
 import IncomeForm from "@/components/IncomeForm";
 import IncomeList from "@/components/IncomeList";
 import type { Income } from "@/lib/types";
@@ -11,6 +12,11 @@ export default async function IncomePage() {
     .order("date", { ascending: false });
 
   const income = (data ?? []) as Income[];
+  const attachmentsByIncomeId = await getAttachmentsByParent({
+    supabase,
+    column: "income_id",
+    parentIds: income.map((item) => item.id),
+  });
 
   return (
     <div className="flex flex-col gap-6">
@@ -21,7 +27,7 @@ export default async function IncomePage() {
         </p>
       </div>
       <IncomeForm />
-      <IncomeList income={income} />
+      <IncomeList income={income} attachmentsByIncomeId={attachmentsByIncomeId} />
     </div>
   );
 }

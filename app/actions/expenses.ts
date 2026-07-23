@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { EXPENSE_CATEGORIES } from "@/lib/types";
+import { uploadAttachments } from "@/lib/attachments";
 
 export type ExpenseFormState = { error: string } | undefined;
 
@@ -30,16 +31,36 @@ export async function addExpense(
     return { error: "Please choose a valid category." };
   }
 
-  const { error } = await supabase.from("expenses").insert({
-    user_id: user.id,
-    description,
-    amount,
-    date,
-    category,
-  });
+  const { data: inserted, error } = await supabase
+    .from("expenses")
+    .insert({
+      user_id: user.id,
+      description,
+      amount,
+      date,
+      category,
+    })
+    .select("id")
+    .single();
 
   if (error) {
     return { error: error.message };
+  }
+
+  const files = formData.getAll("attachments").filter(
+    (value): value is File => value instanceof File && value.size > 0
+  );
+
+  if (files.length > 0) {
+    const uploadError = await uploadAttachments({
+      supabase,
+      userId: user.id,
+      files,
+      parent: { expense_id: inserted.id },
+    });
+    if (uploadError) {
+      return { error: uploadError };
+    }
   }
 
   revalidatePath("/expenses");

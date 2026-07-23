@@ -77,3 +77,50 @@ create policy "Users can update own expenses" on public.expenses
   for update using (auth.uid() = user_id);
 create policy "Users can delete own expenses" on public.expenses
   for delete using (auth.uid() = user_id);
+
+-- Attachments (receipts/invoices) linked to either an income or an expense row.
+create table if not exists public.attachments (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users (id) on delete cascade,
+  income_id uuid references public.income (id) on delete cascade,
+  expense_id uuid references public.expenses (id) on delete cascade,
+  file_path text not null,
+  file_name text not null,
+  file_size bigint not null,
+  content_type text,
+  created_at timestamptz not null default now(),
+  constraint attachments_exactly_one_parent check (
+    (income_id is not null and expense_id is null) or
+    (income_id is null and expense_id is not null)
+  )
+);
+
+create index if not exists attachments_income_id_idx on public.attachments (income_id);
+create index if not exists attachments_expense_id_idx on public.attachments (expense_id);
+
+alter table public.attachments enable row level security;
+
+create policy "Users can view own attachments" on public.attachments
+  for select using (auth.uid() = user_id);
+create policy "Users can insert own attachments" on public.attachments
+  for insert with check (auth.uid() = user_id);
+create policy "Users can delete own attachments" on public.attachments
+  for delete using (auth.uid() = user_id);
+
+-- Private storage bucket for attachment files, one folder per user (`{user_id}/...`).
+insert into storage.buckets (id, name, public)
+values ('attachments', 'attachments', false)
+on conflict (id) do nothing;
+
+create policy "Users can upload to own attachment folder" on storage.objects
+  for insert with check (
+    bucket_id = 'attachments' and (storage.foldername(name))[1] = auth.uid()::text
+  );
+create policy "Users can view own attachment files" on storage.objects
+  for select using (
+    bucket_id = 'attachments' and (storage.foldername(name))[1] = auth.uid()::text
+  );
+create policy "Users can delete own attachment files" on storage.objects
+  for delete using (
+    bucket_id = 'attachments' and (storage.foldername(name))[1] = auth.uid()::text
+  );

@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { uploadAttachments } from "@/lib/attachments";
 
 export type IncomeFormState = { error: string } | undefined;
 
@@ -28,18 +29,38 @@ export async function addIncome(
     return { error: "Please fill in client, a valid amount, and date." };
   }
 
-  const { error } = await supabase.from("income").insert({
-    user_id: user.id,
-    client,
-    amount,
-    date,
-    status,
-    invoice_id: invoiceId || null,
-    notes: notes || null,
-  });
+  const { data: inserted, error } = await supabase
+    .from("income")
+    .insert({
+      user_id: user.id,
+      client,
+      amount,
+      date,
+      status,
+      invoice_id: invoiceId || null,
+      notes: notes || null,
+    })
+    .select("id")
+    .single();
 
   if (error) {
     return { error: error.message };
+  }
+
+  const files = formData.getAll("attachments").filter(
+    (value): value is File => value instanceof File && value.size > 0
+  );
+
+  if (files.length > 0) {
+    const uploadError = await uploadAttachments({
+      supabase,
+      userId: user.id,
+      files,
+      parent: { income_id: inserted.id },
+    });
+    if (uploadError) {
+      return { error: uploadError };
+    }
   }
 
   revalidatePath("/income");

@@ -30,3 +30,17 @@ export type Expense = {
   date: string;
   created_at: string;
 };
+
+export type Attachment = {
+  id: string;
+  user_id: string;
+  income_id: string | null;
+  expense_id: string | null;
+  file_path: string;
+  file_name: string;
+  file_size: number;
+  content_type: string | null;
+  created_at: string;
+};
+
+export type AttachmentWithUrl = Attachment & { url: string | null };

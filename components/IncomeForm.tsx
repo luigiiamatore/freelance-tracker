@@ -73,6 +73,23 @@ export default function IncomeForm() {
         <input id="notes" name="notes" className={inputClass} />
       </div>
 
+      <div className="col-span-full flex flex-col gap-1">
+        <label htmlFor="attachments" className={labelClass}>
+          Attachments (optional)
+        </label>
+        <input
+          id="attachments"
+          name="attachments"
+          type="file"
+          multiple
+          accept="application/pdf,image/png,image/jpeg"
+          className={`${inputClass} file:mr-3 file:rounded-md file:border-0 file:bg-zinc-100 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-zinc-700 dark:file:bg-zinc-800 dark:file:text-zinc-200`}
+        />
+        <p className="text-xs text-zinc-500 dark:text-zinc-400">
+          PDF, PNG, or JPEG, up to 5MB each.
+        </p>
+      </div>
+
       {state?.error && (
         <p className="col-span-full text-sm text-red-600 dark:text-red-400">{state.error}</p>
       )}

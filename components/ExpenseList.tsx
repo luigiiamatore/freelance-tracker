@@ -1,6 +1,7 @@
 import { deleteExpense } from "@/app/actions/expenses";
 import { formatCurrency, formatDate } from "@/lib/format";
-import type { Expense, ExpenseCategory } from "@/lib/types";
+import type { AttachmentWithUrl, Expense, ExpenseCategory } from "@/lib/types";
+import AttachmentList from "@/components/AttachmentList";
 
 const CATEGORY_STYLES: Record<ExpenseCategory, string> = {
   Software: "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-400",
@@ -9,7 +10,13 @@ const CATEGORY_STYLES: Record<ExpenseCategory, string> = {
   Other: "bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-400",
 };
 
-export default function ExpenseList({ expenses }: { expenses: Expense[] }) {
+export default function ExpenseList({
+  expenses,
+  attachmentsByExpenseId,
+}: {
+  expenses: Expense[];
+  attachmentsByExpenseId: Record<string, AttachmentWithUrl[]>;
+}) {
   if (expenses.length === 0) {
     return (
       <p className="rounded-xl border border-dashed border-zinc-300 p-8 text-center text-sm text-zinc-500 dark:border-zinc-700 dark:text-zinc-400">
@@ -35,6 +42,10 @@ export default function ExpenseList({ expenses }: { expenses: Expense[] }) {
             <tr key={item.id}>
               <td className="px-4 py-3 text-sm font-medium text-zinc-900 dark:text-zinc-100">
                 {item.description}
+                <AttachmentList
+                  attachments={attachmentsByExpenseId[item.id] ?? []}
+                  source="expenses"
+                />
               </td>
               <td className="px-4 py-3 text-sm text-zinc-600 dark:text-zinc-400">
                 {formatDate(item.date)}

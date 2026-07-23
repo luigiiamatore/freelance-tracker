@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { getAttachmentsByParent } from "@/lib/attachments";
 import ExpenseForm from "@/components/ExpenseForm";
 import ExpenseList from "@/components/ExpenseList";
 import type { Expense } from "@/lib/types";
@@ -11,6 +12,11 @@ export default async function ExpensesPage() {
     .order("date", { ascending: false });
 
   const expenses = (data ?? []) as Expense[];
+  const attachmentsByExpenseId = await getAttachmentsByParent({
+    supabase,
+    column: "expense_id",
+    parentIds: expenses.map((item) => item.id),
+  });
 
   return (
     <div className="flex flex-col gap-6">
@@ -21,7 +27,7 @@ export default async function ExpensesPage() {
         </p>
       </div>
       <ExpenseForm />
-      <ExpenseList expenses={expenses} />
+      <ExpenseList expenses={expenses} attachmentsByExpenseId={attachmentsByExpenseId} />
     </div>
   );
 }

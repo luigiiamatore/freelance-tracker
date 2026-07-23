@@ -1,6 +1,7 @@
 import { deleteIncome } from "@/app/actions/income";
 import { formatCurrency, formatDate } from "@/lib/format";
-import type { Income, IncomeStatus } from "@/lib/types";
+import type { AttachmentWithUrl, Income, IncomeStatus } from "@/lib/types";
+import AttachmentList from "@/components/AttachmentList";
 
 const STATUS_STYLES: Record<IncomeStatus, string> = {
   paid: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400",
@@ -8,7 +9,13 @@ const STATUS_STYLES: Record<IncomeStatus, string> = {
   overdue: "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400",
 };
 
-export default function IncomeList({ income }: { income: Income[] }) {
+export default function IncomeList({
+  income,
+  attachmentsByIncomeId,
+}: {
+  income: Income[];
+  attachmentsByIncomeId: Record<string, AttachmentWithUrl[]>;
+}) {
   if (income.length === 0) {
     return (
       <p className="rounded-xl border border-dashed border-zinc-300 p-8 text-center text-sm text-zinc-500 dark:border-zinc-700 dark:text-zinc-400">
@@ -37,6 +44,10 @@ export default function IncomeList({ income }: { income: Income[] }) {
                 {item.invoice_id && (
                   <div className="text-xs text-zinc-500 dark:text-zinc-400">#{item.invoice_id}</div>
                 )}
+                <AttachmentList
+                  attachments={attachmentsByIncomeId[item.id] ?? []}
+                  source="income"
+                />
               </td>
               <td className="px-4 py-3 text-sm text-zinc-600 dark:text-zinc-400">
                 {formatDate(item.date)}
